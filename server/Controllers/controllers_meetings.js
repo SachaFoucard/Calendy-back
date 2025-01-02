@@ -25,6 +25,7 @@ exports.weeklyMeetings = async (req, res) => {
         const meetings = await Meeting.find({
             startTime: { $gte: formatISO(startDate), $lte: formatISO(endDate) },
         });
+        console.log('meeting from Back :', meetings);
 
         res.status(200).json(meetings); // Send the meetings as a response
     } catch (error) {
