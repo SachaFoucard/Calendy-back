@@ -37,6 +37,21 @@ exports.createMeetings = async (req, res) => {
     try {
         const { customerName, customerMail, title, startTime, endTime, userBooker, to, id } = req.body;
 
+        // Check if there are any existing meetings that overlap with the requested start and end times
+        const existingMeeting = await Meeting.findOne({
+            $or: [
+                { startTime: { $lt: endTime }, endTime: { $gt: startTime } }, // Overlaps with the requested time range
+                { startTime: { $lt: startTime }, endTime: { $gt: endTime } }  // Overlaps with the requested time range
+            ]
+        });
+
+        if (existingMeeting) {
+            return res.status(400).json({
+                success: false,
+                message: 'The requested time slot is already taken'
+            });
+        }
+
         // Create a new meeting document
         const newMeeting = new Meeting({
             customerName,
@@ -68,6 +83,7 @@ exports.createMeetings = async (req, res) => {
         });
     }
 };
+
 
 
 
